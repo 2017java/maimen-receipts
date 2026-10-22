@@ -92,16 +92,49 @@ def _is_contradictory(rec: dict) -> bool:
     return False
 
 
+def _strip_customizations(name: str) -> str:
+    """剥离点单定制后缀，得到品名主干。
+
+    实测 MCP 订单 itemName 形如：
+      '可乐中杯 冰(去冰)'  -> '可乐中杯'
+      '板烧鸡腿堡 去生菜'  -> '板烧鸡腿堡'
+      '薯条中 不要盐'      -> '薯条中'
+    规则：以空白或 "（/(" 开始的片段（定制选项）整体切掉。
+    """
+    s = _norm(name)
+    # 切掉以空白 + 任意（含括号）开头的尾巴
+    for sep in [" ", "　"]:
+        idx = s.find(sep)
+        if idx > 0:
+            s = s[:idx]
+    # 切掉以全/半角左括号开始的尾巴
+    for br in ["(", "（"]:
+        idx = s.find(br)
+        if idx > 0:
+            s = s[:idx]
+    return s.strip()
+
+
 def _lookup(table: dict[str, dict], name: str) -> tuple[str, dict | None]:
     """查找策略（命中优先）：
     1. 精确同名
-    2. 规格标记抽取：识别 "中/大/小/迷你" 与量词 "杯/块/份/个/盒/包"，去词缀后匹配 "名+规格" 或 "名"
-    3. 含匹配：产品名片段互含（"可乐"⊂"可口可乐"）时挑最接近规格的记录
-    4. 全部失败 -> missing（标 "官方未收录"，不编造）
+    2. 剥离定制后缀（"可乐中杯 冰(去冰)" -> "可乐中杯"）后精确
+    3. 规格标记抽取：识别 "中/大/小/迷你" 与量词 "杯/块/份/个/盒/包"，去词缀后匹配 "名+规格" 或 "名"
+    4. 含匹配：产品名片段互含（"可乐"⊂"可口可乐"）时挑最接近规格的记录
+    5. 全部失败 -> missing（标 "官方未收录"，不编造）
     """
-    key = _norm(name)
-    if key in table:
-        return "exact", table[key]
+    raw = _norm(name)
+    # 先试原名；再试去定制后缀
+    candidates_names = [raw]
+    stripped_custom = _strip_customizations(name)
+    if stripped_custom != raw:
+        candidates_names.append(stripped_custom)
+
+    for key in candidates_names:
+        if key in table:
+            return "exact", table[key]
+
+    key = candidates_names[-1]  # 用去定制后的主干做后续模糊匹配
 
     size_tokens = ["迷你", "大杯", "中杯", "小杯", "大", "中", "小"]
     unit_tokens = ["杯", "块", "份", "个", "盒", "包"]

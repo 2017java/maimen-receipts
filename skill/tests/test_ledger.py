@@ -158,10 +158,29 @@ def t11_multi_qty_not_same_minute():
     return "t11 ok"
 
 
+def t12_customization_suffix():
+    """12) 定制后缀（"可乐中杯 冰(去冰)" / "薯条中 不要盐"）不影响营养匹配。"""
+    from nutrition import _lookup, _strip_customizations, _load_table
+    t = _load_table()
+    for name, want_tier in [
+        ("可乐中杯 冰(去冰)", "spec-mapped"),
+        ("薯条中 不要盐", "exact"),
+        ("板烧鸡腿堡 去生菜", "exact"),
+    ]:
+        tier, rec = _lookup(t, name)
+        assert tier == want_tier, f"{name!r} -> {tier} != {want_tier}"
+        assert rec is not None, f"{name!r} -> rec is None"
+    # 真实官网表外 SKU 必须 missing（不编造）
+    tier, rec = _lookup(t, "培根芝士双牛堡")
+    assert tier == "missing" and rec is None
+    return "t12 ok"
+
+
 ALL = [
     t1_dedup, t2_pricing_wording, t3_pricing_anomaly, t4_combo_no_double_count,
     t5_contradictory_rejected, t6_nutrition_disclosure, t7_personal_preserved,
     t8_corrupt_backup, t9_memory_search, t10_privacy_stripped, t11_multi_qty_not_same_minute,
+    t12_customization_suffix,
 ]
 
 

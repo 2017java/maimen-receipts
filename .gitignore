@@ -25,6 +25,11 @@ orders.json
 personal-data/
 raw-data/
 
+# === 真实订单快照与产出（用户个人交易数据，绝不入库） ===
+docs/real/
+raw_orders.json
+
+
 # === 本地账本运行时目录（skill 默认写入 ~/.maimen-receipts/） ===
 .maimen-receipts/
 
