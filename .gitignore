@@ -1,0 +1,55 @@
+# .gitignore — 严禁上传任何凭证 / 个人信息
+
+# === 凭证与密钥（绝对禁止） ===
+*.token
+token.txt
+*.env
+.env
+.env.*
+!.env.example
+mcp.json
+.mcd-test/
+credentials/
+secrets/
+*.pem
+*.key
+id_rsa*
+*.p12
+*.pfx
+
+# === 麦当劳 / 账号数据（用户个人隐私） ===
+ledger.json
+ledger.corrupt.*
+*.ledger.json
+orders.json
+personal-data/
+raw-data/
+
+# === 本地账本运行时目录（skill 默认写入 ~/.maimen-receipts/） ===
+.maimen-receipts/
+
+# === 生成物（可重新生成，不入库） ===
+docs/outputs/
+*.html.tmp
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+node_modules/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# === 编辑器 / 系统 ===
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# === 日志与调试 ===
+*.log
+logs/
+tmp/
+temp/

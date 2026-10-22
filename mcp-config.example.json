@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "mcd": {
+      "type": "streamable-http",
+      "url": "https://mcp.mcd.cn",
+      "headers": {
+        "Authorization": "Bearer ${MCD_MCP_TOKEN}"
+      },
+      "description": "麦当劳中国官方 MCP Server（read-only 取数；写操作本 skill 一律拒绝）"
+    }
+  },
+  "_security": {
+    "note": "Do NOT commit real tokens. MCD_MCP_TOKEN must come from environment. Each user applies for their own token via https://mcp.mcd.cn (mobile login -> console activation -> agree to ToS).",
+    "rate_limit": "600 req/min",
+    "never": ["embed a real token in this file", "commit .env or token.txt", "expose orderId/phone/address in generated receipts"]
+  }
+}
