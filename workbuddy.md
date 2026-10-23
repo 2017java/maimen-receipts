@@ -1,49 +1,72 @@
-# WorkBuddy 开发上下文 — `maimen-receipts`
+# WorkBuddy 开发上下文
 
-> 本页说明为何 / 如何用 WorkBuddy 完成本 Skill 的开发。**面向评委与后续开发者**。
+本文件说明本项目如何用 WorkBuddy 完成开发，供评审核验 WorkBuddy 专项使用。
 
-## 为什么用 WorkBuddy
+---
 
-WorkBuddy 把「理解需求 → 设计口径 → 实现代码 → 验收测试 → 出稿」压缩为一条工作流。
-本 Skill 的开发过程是 WorkBuddy 一条流水线跑下来的：
+## 使用方式
 
-| 阶段 | WorkBuddy 做了什么 | 落地产物 |
-|---|---|---|
-| 调研 | 分析 8 个榜单项目 + 4 个 MCP 工具实测 + 官网营养表交叉核验 | `references/data-integrity.md` |
-| 方案 | 6 轮迭代（v1~v6）+ 3 个候选赛道（碳 / 省钱 / 记录）实证筛选 | 项目定位 "记录 + 计算 + 记忆" |
-| 实现 | 按 writing-great-skills 原则写 SKILL.md + 4 个 Python 核心模块 | `skill/core/*.py` |
-| 验收 | 13 条硬验收测试全部自动化，回归即跑 | `skill/tests/test_ledger.py` |
-| 交付 | 5 必交文件 + 声明 + Demo 模式 + 文档 | `README.md` 等 |
+Skill 装好后，在 WorkBuddy 里用自然语言直接调用，无需记命令：
 
-## 工程纪律（写进了 skill）
-
-1. **取数交给 MCP，算术交给代码，表达交给 Agent** —— 模型永不编数字。
-2. **三档可信度标注**：精确 / 规格映射 / 官方未收录。任何数据缺失写 `官方未收录`，不编造。
-3. **单一真源**：算法细节只在 `references/algorithms.md`；README / SKILL.md 只引用不复制。
-4. **可回放的验收**：13 条测试覆盖去重 / 口径 / 套餐不双算 / 异常剔除 / 损坏备份 / 脱敏 / 记忆检索，新改动跑一遍即知。
-
-## 用 WorkBuddy 复现开发
-
-```text
-提示词示例：
-"基于 raw/official_nutrition.json 官网营养表，按 references/algorithms.md 三档算法
-实现 skill/core/nutrition.py；异常行（kcal=0 但 carb>0.5）必须剔除并留痕；
-不许反推钠；覆盖率与'已匹配 N/M'必须在 export 展示。"
-
-WorkBuddy 会：
-- 读单源（algorithms.md）而不是自己发明
-- 写完自动跑 test_ledger.py 回归
-- 按 SKILL.md 硬规则检查（口径纪律 / 不编造 / 脱敏）
+```
+导入我的麦当劳订单，出一张票根
+这一单省了多少？
+给 9 月 21 号那单补一句：面试结束，奖励自己
+找面试那天的票根
+出 9 月的票根册
 ```
 
-## 给后续开发者的提示
+Agent 读取根目录 `SKILL.md` 后按六步循环执行；所有金额与营养数字由 `skill/core/*.py` 计算，模型只负责措辞与排版。
 
-- **不要在 README/SKILL.md 复制算法**：改算法只改 `references/algorithms.md`，实现改 `skill/core/*.py`。
-- **不要内置 Token**：`mcp-config.example.json` 只放 `${MCD_MCP_TOKEN}` 占位符；真实 `mcp.json` 已被 `.gitignore` 屏蔽。
-- **不要给营养数字加单位换算以外的修饰**：任何 "约等于" / "相当于" 必须显式标注。
-- **改了核心算法必须补测试**：13 条验收用例是底线，可加不可删。
+---
 
-## WorkBuddy 相关链接
+## 开发流程
+
+| 阶段 | WorkBuddy 承担的工作 | 落地产物 |
+|---|---|---|
+| 数据核验 | 实调 MCP 工具、交叉核验官网营养表 | `references/data-integrity.md` |
+| 口径设计 | 确定核价算法、营养可信度分级、边界处理 | `references/algorithms.md` |
+| 实现 | 按 Skill 写作原则编写 `SKILL.md` + 5 个 Python 模块 | `skill/core/*.py` |
+| 验收 | 13 条自动化验收用例，改动即回归 | `skill/tests/test_ledger.py` |
+| 交付 | 项目文档 + Demo 模式 + 参赛材料 | `README.md` 等 |
+
+---
+
+## 工程约束
+
+1. **取数交给 MCP，算术交给代码，表达交给 Agent** —— 模型不编数字。
+2. **四档可信度标注**：`实测` / `实测·规格映射` / `估算±20%` / `官方未收录`。缺失一律标 `官方未收录`，不推测。
+3. **单一真源**：算法只在 `references/algorithms.md` 定义；`README.md` 与 `SKILL.md` 只引用不复制。
+4. **可回放的验收**：13 条测试覆盖去重、核价口径、套餐父子不双算、异常行剔除、损坏备份、脱敏、记忆检索命中与未命中、定制后缀匹配、派生数据持久化。
+
+---
+
+## 复现示例
+
+```text
+提示词：
+"基于 skill/data/nutrition_official.json 官方营养表，按 references/algorithms.md 的四档算法
+实现 skill/core/nutrition.py。要求：
+ - 异常行（能量 0 但碳水 > 0.5）必须剔除并写入 rejected_rows
+ - 钠不反推
+ - 票根必须展示 '已匹配 N/M 项'
+ - 不推测、不用近似品替代未收录项"
+```
+
+WorkBuddy 会以 `references/algorithms.md` 为唯一口径来源实现，写完自动跑 `test_ledger.py` 回归，并按 `SKILL.md` 的口径规则自检。
+
+---
+
+## 后续开发注意事项
+
+- **算法改动只改一处**：`references/algorithms.md` 定口径，`skill/core/*.py` 落实现，不要在 README / SKILL.md 复制算法描述。
+- **不内置任何凭证**：`mcp-config.example.json` 仅含 `${MCD_MCP_TOKEN}` 占位符。
+- **营养数字不加额外修辞**：除单位换算外，任何「约等于」「相当于」必须显式标注为估算。
+- **核心算法改动必须补测试**：13 条是底线，可加不可删。
+
+---
+
+## 相关链接
 
 - WorkBuddy 文档：<https://www.workbuddy.cn/docs/workbuddy/Overview>
-- 官方 Skill 写作原则：`writing-great-skills`（predictability / leading words / information hierarchy / progressive disclosure / no-op 测试）
+- Skill 写作原则：`writing-great-skills`（predictability / leading words / information hierarchy / progressive disclosure）

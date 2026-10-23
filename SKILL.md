@@ -1,43 +1,44 @@
 ---
 name: maimen-receipts
-description: Use when the user asks to import McDonalds China orders into a personal receipt book, generate a per-order receipt (savings + nutrition), add a one-line note to an order, find an old order by phrase or date, or export a monthly receipt book. Triggers: 麦门票根册 / 票根 / 记一单 / 这一单省了多少 / 麦门账本 / 找那天的票根 / 麦当劳订单. Knowledge cutoff: offline core (ledger/pricing/nutrition/memory/export) is deterministic Python; live McDonalds MCP is only needed to *fetch* orders — skill works fully offline on a pre-existing ledger.
+description: 麦门票根册。用于导入麦当劳订单到个人账本、生成单张票根（核价 + 营养）、给订单补一句话、按关键词或日期找回旧订单、导出月度票根册。触发词：麦门票根册 / 票根 / 记一单 / 这一单省了多少 / 麦门账本 / 找那天的票根 / 麦当劳订单。离线可用：核价 / 营养 / 记忆 / 导出全部是确定性 Python，只有拉取订单需要麦当劳 MCP。
 agent_created: true
 ---
 
-# maimen-receipts — 麦门票根册
+# 麦门票根册
 
 记录你的每一单，算清每一笔，记住每一个瞬间。
 
-**分工纪律（不可破）**：取数交给 MCP，算术交给代码，表达交给 Agent。**模型永不编数字** —— 所有金额、营养、省下值由 `skill/core/*.py` 算出，Agent 只负责措辞与排版。
+**分工纪律**：取数交给 MCP，算术交给代码，表达交给 Agent。**模型不编数字** —— 所有金额、营养、省下值由 `skill/core/*.py` 算出，Agent 只负责措辞与排版。
 
 ## 边界
 
-| Skill 内 | Skill 外 |
+| 本 Skill 负责 | 不做 |
 |---|---|
-| 导入 / 去重 / 持久化 / 票根 HTML / 记忆检索 | 订单源获取（MCP `order-list` / `query-order`） |
-| 省钱核价（`pricing.py`） | 下单、取消、领券、兑换（**一律拒绝**） |
-| 营养三档（`nutrition.py`） | 任何健康建议 / 跨品牌对比 / 运势（**一律拒绝**） |
-| 一句话补记 / 找回（`memory.py`） | 修改官方交易事实（**一律拒绝**） |
+| 导入 / 去重 / 持久化 / 票根 HTML / 记忆检索 | 拉取订单源（走 MCP `order-list` / `query-order`） |
+| 核价（`pricing.py`） | 下单、取消、领券、兑换 |
+| 营养（`nutrition.py`） | 健康建议、跨品牌对比、运势 |
+| 一句话补记 / 找回（`memory.py`） | 修改官方交易事实 |
 
 ## 六步循环
 
 | 步 | 动作 | 完成判定 |
 |---|---|---|
-| ① 导入 | 调 `ledger.ingest(order_json)` | 账本里新增条数 = 去重后条数；同 orderId 只一条 |
-| ② 票根 | 调 `export.receipt(order_id)` | HTML 落盘；**每张票根含"这一单相对原价省了 ¥X"或明确写"无法核价"** |
-| ③ 补记 | 调 `memory.note(order_id, text)` | 备注写入 personal 层；官方交易层字段未被改动 |
-| ④ 重同步 | 再次 `ledger.ingest` | 条数不增；接口未返回的旧单**不删** |
-| ⑤ 找回 | 调 `memory.search(phrase)` | 返回命中票根 id 列表；无命中时**明说"没找到"**，不猜 |
-| ⑥ 导出 | 调 `export.book(month)` | 单文件 HTML；含月度小结（单数/支出/省下/营养 TOP） |
+| ① 导入 | `ledger.ingest(order_json)` | 同 `orderId` 只一条；重导不增条数 |
+| ② 票根 | `export.receipt(order_id)` | HTML 落盘，且含「这一单相对原价省了 ¥X」或明确写「无法核价」 |
+| ③ 补记 | `memory.note(order_id, text)` | 备注写入个人层，官方交易字段未变 |
+| ④ 重同步 | 再次 `ledger.ingest` | 条数不增；接口未返回的旧单不删 |
+| ⑤ 找回 | `memory.search(phrase)` | 返回命中列表；无命中时明说「没找到」，不猜 |
+| ⑥ 导出 | `export.book(month)` | 单文件 HTML，含月度小结（单数 / 支出 / 省下） |
 
-## 硬规则
+## 口径规则
 
-- **省钱口径**：只写「这一单相对原价省了 ¥X」。原价来源只信 `query-meals` 菜单价或订单 `totalAmount`；**不信 `calculate-price.originalPrice`**（实测虚高：菜单 28/58，算价按 58 计）。
-- **营养三档**：`精确`（同名累加）/ `估算±20%`（4-4-9 反推）/ `官方未收录`。**钠永不反推**（腌料主导，与主料关系弱）。每个数字旁标档位。
-- **不编造**：无数据就写 `官方未收录`；查不到就写 `没找到`；份额不明就问，不默认全部归一人。
-- **脱敏**：票根默认不渲染 订单号/手机号/地址/取餐码/支付号；导出前自检一遍。
-- **损坏先备份**：账本 JSON 解析失败 → 复制到 `ledger.corrupt.<ts>.json` 再空态，**不静默清空**。
-- **Demo 隔离**：`docs/demo/` 样例账本物理独立于用户账本，任何产出页顶标"演示数据"。
+- **核价**：只写「这一单相对原价省了 ¥X」。原价用订单 `totalAmount` 或 `query-meals` 菜单价；`calculate-price.originalPrice` 与菜单价存在偏差，不作核价基准。
+- **营养四档**：`实测`（同名匹配）/ `实测·规格映射`（官方表有该品不同规格）/ `估算±20%`（仅当官方值缺字段时 4-4-9 反推）/ `官方未收录`（不推测、不映射近似品）。每个数字旁标档位。
+- **钠永不反推**：由腌料酱料决定，与主料关系弱，缺就缺。
+- **不编造**：无数据写 `官方未收录`；查不到写 `没找到`；份额不明就问，不默认全归一人。
+- **脱敏**：票根不渲染订单号 / 手机号 / 地址 / 取餐码 / 支付号，仅显示订单号末四位。
+- **损坏先备份**：账本解析失败先复制到 `ledger.corrupt.<ts>.json` 再空态，不静默清空。
+- **Demo 隔离**：`docs/demo/` 示例账本与用户账本物理分离，产出页顶标「演示数据」。
 
 ## 调用方式
 
@@ -62,6 +63,6 @@ python skill/core/export.py book 2026-10 -o docs/outputs/
 
 ## 进阶
 
-- 数据口径与已知数据缺陷 → [`references/data-integrity.md`](references/data-integrity.md)
-- 计算细节（核价三场景 / 营养三档算法）→ [`references/algorithms.md`](references/algorithms.md)
-- MCP 调用清单与陷阱 → 仓库根 `MCP_INTEGRATION.md`
+- 数据来源与口径边界 → [`references/data-integrity.md`](references/data-integrity.md)
+- 计算细节（核价三场景 / 营养四档算法）→ [`references/algorithms.md`](references/algorithms.md)
+- MCP 调用清单与业务价值 → [`MCP_INTEGRATION.md`](MCP_INTEGRATION.md)
