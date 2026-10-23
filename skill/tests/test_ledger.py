@@ -176,11 +176,23 @@ def t12_customization_suffix():
     return "t12 ok"
 
 
+def t13_calc_persisted():
+    """13) calc 在 ingest 时持久化：stats 读到的 total_saved 必须非 0（不依赖 export 先跑）。"""
+    from ledger import stats
+    p = Path(tempfile.mkdtemp()) / "ledger.json"
+    ingest(p, _order("A1"))
+    s = stats(p)
+    assert s["total_saved"] == "12.70", f"expected 12.70, got {s['total_saved']}"
+    l = load(p)
+    assert l["orders"]["A1"]["calc"].get("nutrition_full"), "calc.nutrition_full must persist"
+    return "t13 ok"
+
+
 ALL = [
     t1_dedup, t2_pricing_wording, t3_pricing_anomaly, t4_combo_no_double_count,
     t5_contradictory_rejected, t6_nutrition_disclosure, t7_personal_preserved,
     t8_corrupt_backup, t9_memory_search, t10_privacy_stripped, t11_multi_qty_not_same_minute,
-    t12_customization_suffix,
+    t12_customization_suffix, t13_calc_persisted,
 ]
 
 

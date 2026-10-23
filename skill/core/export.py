@@ -21,7 +21,7 @@ from pathlib import Path
 from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from ledger import DEFAULT_LEDGER, load  # noqa: E402
+from ledger import DEFAULT_LEDGER, _derive_calc, load  # noqa: E402
 from pricing import audit_order  # noqa: E402
 from nutrition import compute as compute_nutrition  # noqa: E402
 
@@ -292,9 +292,7 @@ def main(argv=None) -> int:
             print(json.dumps({"ok": False, "error": "order not found"}))
             return 1
         if not o.get("calc", {}).get("nutrition_full"):
-            o.setdefault("calc", {})
-            o["calc"].update(audit_order(o["official"]))
-            o["calc"]["nutrition_full"] = compute_nutrition(o["official"].get("items", []))
+            o["calc"] = _derive_calc(o["official"])
         html_s = render_receipt(o, demo=a.demo)
         fp = out_dir / f"receipt-{a.order_id}.html"
         fp.write_text(html_s, encoding="utf-8")
@@ -303,10 +301,8 @@ def main(argv=None) -> int:
 
     if a.cmd == "book":
         for o in ledger.get("orders", {}).values():
-            o.setdefault("calc", {})
-            if not o["calc"].get("nutrition_full"):
-                o["calc"].update(audit_order(o["official"]))
-                o["calc"]["nutrition_full"] = compute_nutrition(o["official"].get("items", []))
+            if not o.get("calc", {}).get("nutrition_full"):
+                o["calc"] = _derive_calc(o["official"])
         html_s = render_book(ledger, a.month, demo=a.demo)
         fp = out_dir / f"book-{a.month}.html"
         fp.write_text(html_s, encoding="utf-8")

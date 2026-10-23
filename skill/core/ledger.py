@@ -135,7 +135,11 @@ def save(path: Path, ledger: dict) -> None:
 # ---------------- 动作 ----------------
 
 def ingest(path: Path, raw: dict) -> dict:
-    """导入一单。返回 {ok, order_id, added, updated, deduped, total}。"""
+    """导入一单。返回 {ok, order_id, added, updated, deduped, total}。
+
+    calc 是纯派生数据（核价 + 营养），在这里算好并持久化，
+    这样 `stats` 读到的 saved 立即正确，不依赖 export 先跑一遍。
+    """
     official = _normalize_order(raw)
     ledger = load(path)
     oid = official["orderId"]
@@ -143,7 +147,7 @@ def ingest(path: Path, raw: dict) -> dict:
     entry = ledger["orders"].get(oid, {"personal": {"note": "", "tags": [], "would_reorder": None}})
     entry["official"] = official
     entry.setdefault("personal", {"note": "", "tags": [], "would_reorder": None})
-    entry.setdefault("calc", {})
+    entry["calc"] = _derive_calc(official)
     entry["privacy"] = {"orderId_masked": _mask_order_id(oid)}
     ledger["orders"][oid] = entry
     save(path, ledger)
@@ -154,8 +158,19 @@ def ingest(path: Path, raw: dict) -> dict:
         "updated": 1 if existed else 0,
         "deduped": existed,
         "total": len(ledger["orders"]),
+        "saved": entry["calc"].get("saved"),
         "ledger": str(path),
     }
+
+
+def _derive_calc(official: dict) -> dict:
+    """由 official 派生 calc（核价 + 营养）。纯函数，无副作用。"""
+    from pricing import audit_order
+    from nutrition import compute as compute_nutrition
+
+    calc = dict(audit_order(official))
+    calc["nutrition_full"] = compute_nutrition(official.get("items", []))
+    return calc
 
 
 def stats(path: Path) -> dict:
