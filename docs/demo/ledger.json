@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-10-22T16:56:22",
+  "updated_at": "2026-10-23T14:55:39",
   "orders": {
     "DEMO-A1": {
       "personal": {
@@ -13,9 +13,9 @@
       },
       "official": {
         "orderId": "DEMO-A1",
-        "createTime": "2026-10-22 12:30:00",
+        "createTime": "2026-10-08 12:30:00",
         "storeName": "麦当劳·示例店",
-        "orderStatus": "已完成",
+        "orderStatus": "订单已完成",
         "items": [
           {
             "name": "大堡口福三件套",
@@ -31,7 +31,7 @@
                 "qty": 1
               },
               {
-                "name": "可乐中杯",
+                "name": "可乐中杯 冰(去冰)",
                 "qty": 1
               }
             ]
@@ -42,14 +42,73 @@
         "totalDiscountAmount": "12.70",
         "source": "mcp"
       },
-      "calc": {},
+      "calc": {
+        "tier": "exact",
+        "method": "totalAmount - realTotalAmount (from query-order)",
+        "total": "36.60",
+        "real": "23.90",
+        "discount": "12.70",
+        "saved": "12.70",
+        "saved_pct": "34.7",
+        "wording": "这一单相对原价省了 ¥12.70",
+        "nutrition_full": {
+          "tier": "含规格映射",
+          "matched_items": 3,
+          "total_items": 3,
+          "exact": 1,
+          "estimated": 2,
+          "missing": 0,
+          "totals": {
+            "energy_kj": 3855.0,
+            "protein_g": 28.0,
+            "fat_g": 36.0,
+            "carb_g": 116.0,
+            "sodium_mg": 1373.0
+          },
+          "rejected_rows": [],
+          "rows": [
+            {
+              "name": "麦辣鸡腿汉堡",
+              "qty": 1,
+              "tier": "精确",
+              "energy_kj": 2029.0,
+              "protein_g": 24.0,
+              "fat_g": 24.0,
+              "carb_g": 42.0,
+              "sodium_mg": 1208.0
+            },
+            {
+              "name": "中薯条",
+              "qty": 1,
+              "tier": "规格映射",
+              "energy_kj": 1210.0,
+              "protein_g": 4.0,
+              "fat_g": 12.0,
+              "carb_g": 38.0,
+              "sodium_mg": 165.0
+            },
+            {
+              "name": "可乐中杯 冰(去冰)",
+              "qty": 1,
+              "tier": "规格映射",
+              "energy_kj": 616.0,
+              "protein_g": 0.0,
+              "fat_g": 0.0,
+              "carb_g": 36.0,
+              "sodium_mg": 0.0
+            }
+          ],
+          "coverage_pct": 100.0,
+          "disclosure": "已匹配 3/3 项"
+        }
+      },
       "privacy": {
         "orderId_masked": "****O-A1"
       }
     },
     "DEMO-A2": {
       "personal": {
-        "note": "周末家庭聚餐",
+        "note": "周末和家里人一起吃",
         "tags": [
           "家庭",
           "周末"
@@ -58,9 +117,9 @@
       },
       "official": {
         "orderId": "DEMO-A2",
-        "createTime": "2026-10-25 19:00:00",
+        "createTime": "2026-10-12 19:05:00",
         "storeName": "麦当劳·示例店",
-        "orderStatus": "已完成",
+        "orderStatus": "订单已完成",
         "items": [
           {
             "name": "巨无霸",
@@ -86,9 +145,417 @@
         "totalDiscountAmount": "14.80",
         "source": "mcp"
       },
-      "calc": {},
+      "calc": {
+        "tier": "exact",
+        "method": "totalAmount - realTotalAmount (from query-order)",
+        "total": "48.00",
+        "real": "33.20",
+        "discount": "14.80",
+        "saved": "14.80",
+        "saved_pct": "30.8",
+        "wording": "这一单相对原价省了 ¥14.80",
+        "nutrition_full": {
+          "tier": "含规格映射",
+          "matched_items": 3,
+          "total_items": 3,
+          "exact": 2,
+          "estimated": 1,
+          "missing": 0,
+          "totals": {
+            "energy_kj": 4471.0,
+            "protein_g": 36.0,
+            "fat_g": 47.0,
+            "carb_g": 120.0,
+            "sodium_mg": 1242.0
+          },
+          "rejected_rows": [],
+          "rows": [
+            {
+              "name": "巨无霸",
+              "qty": 1,
+              "tier": "精确",
+              "energy_kj": 2146.0,
+              "protein_g": 27.0,
+              "fat_g": 26.0,
+              "carb_g": 42.0,
+              "sodium_mg": 961.0
+            },
+            {
+              "name": "中薯条",
+              "qty": 1,
+              "tier": "规格映射",
+              "energy_kj": 1210.0,
+              "protein_g": 4.0,
+              "fat_g": 12.0,
+              "carb_g": 38.0,
+              "sodium_mg": 165.0
+            },
+            {
+              "name": "奥利奥麦旋风",
+              "qty": 1,
+              "tier": "精确",
+              "energy_kj": 1115.0,
+              "protein_g": 5.0,
+              "fat_g": 9.0,
+              "carb_g": 40.0,
+              "sodium_mg": 116.0
+            }
+          ],
+          "coverage_pct": 100.0,
+          "disclosure": "已匹配 3/3 项"
+        }
+      },
       "privacy": {
         "orderId_masked": "****O-A2"
+      }
+    },
+    "DEMO-A3": {
+      "personal": {
+        "note": "赶早班车，路上吃的早餐",
+        "tags": [
+          "通勤",
+          "早餐"
+        ],
+        "would_reorder": null
+      },
+      "official": {
+        "orderId": "DEMO-A3",
+        "createTime": "2026-10-15 08:12:00",
+        "storeName": "麦当劳·示例店",
+        "orderStatus": "订单已完成",
+        "items": [
+          {
+            "name": "猪柳蛋麦满分",
+            "qty": 1,
+            "price": "16.50",
+            "combo": []
+          },
+          {
+            "name": "小杯鲜萃咖啡",
+            "qty": 1,
+            "price": "6.50",
+            "combo": []
+          }
+        ],
+        "totalAmount": "23.00",
+        "realTotalAmount": "16.90",
+        "totalDiscountAmount": "6.10",
+        "source": "mcp"
+      },
+      "calc": {
+        "tier": "exact",
+        "method": "totalAmount - realTotalAmount (from query-order)",
+        "total": "23.00",
+        "real": "16.90",
+        "discount": "6.10",
+        "saved": "6.10",
+        "saved_pct": "26.5",
+        "wording": "这一单相对原价省了 ¥6.10",
+        "nutrition_full": {
+          "tier": "精确",
+          "matched_items": 1,
+          "total_items": 2,
+          "exact": 1,
+          "estimated": 0,
+          "missing": 1,
+          "totals": {
+            "energy_kj": 1618.0,
+            "protein_g": 23.0,
+            "fat_g": 21.0,
+            "carb_g": 25.0,
+            "sodium_mg": 846.0
+          },
+          "rejected_rows": [],
+          "rows": [
+            {
+              "name": "猪柳蛋麦满分",
+              "qty": 1,
+              "tier": "精确",
+              "energy_kj": 1618.0,
+              "protein_g": 23.0,
+              "fat_g": 21.0,
+              "carb_g": 25.0,
+              "sodium_mg": 846.0
+            },
+            {
+              "name": "小杯鲜萃咖啡",
+              "qty": 1,
+              "tier": "官方未收录"
+            }
+          ],
+          "coverage_pct": 50.0,
+          "disclosure": "已匹配 1/2 项"
+        }
+      },
+      "privacy": {
+        "orderId_masked": "****O-A3"
+      }
+    },
+    "DEMO-A4": {
+      "personal": {
+        "note": "加班到十点，试了新品",
+        "tags": [
+          "加班",
+          "新品"
+        ],
+        "would_reorder": null
+      },
+      "official": {
+        "orderId": "DEMO-A4",
+        "createTime": "2026-10-18 21:40:00",
+        "storeName": "麦当劳·示例店",
+        "orderStatus": "订单已完成",
+        "items": [
+          {
+            "name": "龙焰脆鸡堡",
+            "qty": 1,
+            "price": "26.00",
+            "combo": []
+          },
+          {
+            "name": "大薯条",
+            "qty": 1,
+            "price": "16.00",
+            "combo": []
+          }
+        ],
+        "totalAmount": "42.00",
+        "realTotalAmount": "35.00",
+        "totalDiscountAmount": "7.00",
+        "source": "mcp"
+      },
+      "calc": {
+        "tier": "exact",
+        "method": "totalAmount - realTotalAmount (from query-order)",
+        "total": "42.00",
+        "real": "35.00",
+        "discount": "7.00",
+        "saved": "7.00",
+        "saved_pct": "16.7",
+        "wording": "这一单相对原价省了 ¥7.00",
+        "nutrition_full": {
+          "tier": "含规格映射",
+          "matched_items": 1,
+          "total_items": 2,
+          "exact": 0,
+          "estimated": 1,
+          "missing": 1,
+          "totals": {
+            "energy_kj": 1587.0,
+            "protein_g": 6.0,
+            "fat_g": 16.0,
+            "carb_g": 50.0,
+            "sodium_mg": 216.0
+          },
+          "rejected_rows": [],
+          "rows": [
+            {
+              "name": "龙焰脆鸡堡",
+              "qty": 1,
+              "tier": "官方未收录"
+            },
+            {
+              "name": "大薯条",
+              "qty": 1,
+              "tier": "规格映射",
+              "energy_kj": 1587.0,
+              "protein_g": 6.0,
+              "fat_g": 16.0,
+              "carb_g": 50.0,
+              "sodium_mg": 216.0
+            }
+          ],
+          "coverage_pct": 50.0,
+          "disclosure": "已匹配 1/2 项"
+        }
+      },
+      "privacy": {
+        "orderId_masked": "****O-A4"
+      }
+    },
+    "DEMO-A5": {
+      "personal": {
+        "note": "健身后补充蛋白质",
+        "tags": [
+          "健身"
+        ],
+        "would_reorder": null
+      },
+      "official": {
+        "orderId": "DEMO-A5",
+        "createTime": "2026-10-20 13:20:00",
+        "storeName": "麦当劳·示例店",
+        "orderStatus": "订单已完成",
+        "items": [
+          {
+            "name": "板烧鸡腿堡",
+            "qty": 1,
+            "price": "22.00",
+            "combo": []
+          },
+          {
+            "name": "麦乐鸡5块",
+            "qty": 1,
+            "price": "9.50",
+            "combo": []
+          }
+        ],
+        "totalAmount": "31.50",
+        "realTotalAmount": "31.50",
+        "totalDiscountAmount": "0",
+        "source": "mcp"
+      },
+      "calc": {
+        "tier": "exact",
+        "method": "totalAmount - realTotalAmount (from query-order)",
+        "total": "31.50",
+        "real": "31.50",
+        "discount": "0",
+        "saved": "0.00",
+        "saved_pct": "0.0",
+        "wording": "这一单相对原价省了 ¥0.00",
+        "nutrition_full": {
+          "tier": "精确",
+          "matched_items": 1,
+          "total_items": 2,
+          "exact": 1,
+          "estimated": 0,
+          "missing": 1,
+          "totals": {
+            "energy_kj": 1638.0,
+            "protein_g": 23.0,
+            "fat_g": 17.0,
+            "carb_g": 35.0,
+            "sodium_mg": 1041.0
+          },
+          "rejected_rows": [],
+          "rows": [
+            {
+              "name": "板烧鸡腿堡",
+              "qty": 1,
+              "tier": "精确",
+              "energy_kj": 1638.0,
+              "protein_g": 23.0,
+              "fat_g": 17.0,
+              "carb_g": 35.0,
+              "sodium_mg": 1041.0
+            },
+            {
+              "name": "麦乐鸡5块",
+              "qty": 1,
+              "tier": "官方未收录"
+            }
+          ],
+          "coverage_pct": 50.0,
+          "disclosure": "已匹配 1/2 项"
+        }
+      },
+      "privacy": {
+        "orderId_masked": "****O-A5"
+      }
+    },
+    "DEMO-A6": {
+      "personal": {
+        "note": "项目上线，团队一起点外卖",
+        "tags": [
+          "工作",
+          "团队"
+        ],
+        "would_reorder": null
+      },
+      "official": {
+        "orderId": "DEMO-A6",
+        "createTime": "2026-10-22 18:55:00",
+        "storeName": "麦当劳·示例店",
+        "orderStatus": "订单已完成",
+        "items": [
+          {
+            "name": "板烧鸡腿堡套餐",
+            "qty": 1,
+            "price": "41.50",
+            "combo": [
+              {
+                "name": "板烧鸡腿堡",
+                "qty": 1
+              },
+              {
+                "name": "大薯条",
+                "qty": 1
+              },
+              {
+                "name": "雪碧中杯",
+                "qty": 1
+              }
+            ]
+          }
+        ],
+        "totalAmount": "59.00",
+        "realTotalAmount": "41.50",
+        "totalDiscountAmount": "17.50",
+        "source": "mcp"
+      },
+      "calc": {
+        "tier": "exact",
+        "method": "totalAmount - realTotalAmount (from query-order)",
+        "total": "59.00",
+        "real": "41.50",
+        "discount": "17.50",
+        "saved": "17.50",
+        "saved_pct": "29.7",
+        "wording": "这一单相对原价省了 ¥17.50",
+        "nutrition_full": {
+          "tier": "含规格映射",
+          "matched_items": 3,
+          "total_items": 3,
+          "exact": 1,
+          "estimated": 2,
+          "missing": 0,
+          "totals": {
+            "energy_kj": 3665.0,
+            "protein_g": 29.0,
+            "fat_g": 33.0,
+            "carb_g": 111.0,
+            "sodium_mg": 1286.0
+          },
+          "rejected_rows": [],
+          "rows": [
+            {
+              "name": "板烧鸡腿堡",
+              "qty": 1,
+              "tier": "精确",
+              "energy_kj": 1638.0,
+              "protein_g": 23.0,
+              "fat_g": 17.0,
+              "carb_g": 35.0,
+              "sodium_mg": 1041.0
+            },
+            {
+              "name": "大薯条",
+              "qty": 1,
+              "tier": "规格映射",
+              "energy_kj": 1587.0,
+              "protein_g": 6.0,
+              "fat_g": 16.0,
+              "carb_g": 50.0,
+              "sodium_mg": 216.0
+            },
+            {
+              "name": "雪碧中杯",
+              "qty": 1,
+              "tier": "规格映射",
+              "energy_kj": 440.0,
+              "protein_g": 0.0,
+              "fat_g": 0.0,
+              "carb_g": 26.0,
+              "sodium_mg": 29.0
+            }
+          ],
+          "coverage_pct": 100.0,
+          "disclosure": "已匹配 3/3 项"
+        }
+      },
+      "privacy": {
+        "orderId_masked": "****O-A6"
       }
     }
   }

@@ -89,9 +89,27 @@ h2.section{
   text-transform:uppercase; margin:24px 0 8px;
 }
 .demo-banner{
-  background:var(--stamp); color:#fff; text-align:center;
-  padding:6px; font-size:12px; letter-spacing:.12em;
+  background:rgba(194,58,34,.08); color:var(--stamp);
+  border-bottom:1px solid rgba(194,58,34,.22);
+  text-align:center; padding:8px; font-size:11px; letter-spacing:.18em;
+  font-weight:600;
 }
+.detail{
+  margin:8px 0 4px; border-top:1px solid var(--receipt-line); padding-top:6px;
+}
+.detail-row{
+  display:flex; gap:8px; align-items:baseline;
+  font-size:12px; padding:2px 0; color:var(--ink-60);
+}
+.detail-row .d-name{flex:1; color:var(--ink);}
+.detail-row .d-tier{
+  font-size:10px; letter-spacing:.06em; white-space:nowrap;
+  color:var(--ink-60);
+}
+.detail-row .d-num{white-space:nowrap; min-width:72px; text-align:right;}
+.detail-row.missing .d-name{color:var(--ink-60);}
+.detail-row.missing .d-tier{color:var(--stamp);}
+.detail-row.missing .d-num{color:var(--ink-30);}
 .month-card{
   background:var(--paper-raised); border:1px solid var(--receipt-line);
   padding:16px; margin:16px 0; border-radius:2px;
@@ -121,7 +139,7 @@ def _tier_stamp(tier: str) -> str:
     return '<span class="stamp miss">官方未收录</span>'
 
 
-def render_receipt(order: dict, *, demo: bool = False) -> str:
+def render_receipt(order: dict, *, demo: bool = False, embedded: bool = False) -> str:
     o = order["official"]
     calc = order.get("calc", {}) or audit_order(o)
     personal = order.get("personal", {}) or {}
@@ -190,6 +208,30 @@ def render_receipt(order: dict, *, demo: bool = False) -> str:
         f'<span class="num mono">{_esc(totals.get("sodium_mg", 0))} mg</span></div>'
     )
     lines.append(f'<div class="privacy">数据覆盖：{_esc(nut.get("disclosure",""))}（钠不反推，缺即缺）</div>')
+
+    # 逐项营养明细（让"未收录"看得见，而不是只给一个 N/M）
+    rows = nut.get("rows", [])
+    if rows:
+        detail = []
+        for r in rows:
+            name = _esc(r.get("name", ""))
+            qty = _esc(r.get("qty", 1))
+            tier_label = r.get("tier", "")
+            e = r.get("energy_kj")
+            if e is not None:
+                detail.append(
+                    f'<div class="detail-row"><span class="d-name">{name} ×{qty}</span>'
+                    f'<span class="d-tier">{_esc(tier_label)}</span>'
+                    f'<span class="d-num mono">{_esc(round(e, 1))} kJ</span></div>'
+                )
+            else:
+                detail.append(
+                    f'<div class="detail-row missing"><span class="d-name">{name} ×{qty}</span>'
+                    f'<span class="d-tier">{_esc(tier_label)}</span>'
+                    f'<span class="d-num mono">—</span></div>'
+                )
+        lines.append('<div class="detail">' + "".join(detail) + '</div>')
+
     if nut.get("rejected_rows"):
         names = ", ".join(_esc(r.get("name","")) for r in nut["rejected_rows"])
         lines.append(f'<div class="privacy">已剔除矛盾/占位行：{names}</div>')
@@ -203,19 +245,25 @@ def render_receipt(order: dict, *, demo: bool = False) -> str:
     masked = order.get("privacy", {}).get("orderId_masked", "****")
     lines.append(f'<div class="privacy mono">票号 {_esc(masked)}（订单号 / 手机号 / 地址 / 取餐码 / 支付号 默认不渲染）</div>')
 
-    banner = '<div class="demo-banner">演示数据 · DEMO</div>' if demo else ''
+    banner = '<div class="demo-banner">演示数据 · DEMO</div>' if (demo and not embedded) else ''
+
+    body = f"""<div class="receipt">
+  <div class="receipt-header">
+    <div class="brand">maimen · receipts</div>
+    {''.join(lines)}
+  </div>
+</div>"""
+
+    if embedded:
+        return body
+
     return f"""<!DOCTYPE html>
 <html lang="zh-CN"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>麦门票根 · {_esc(o.get("createTime",""))}</title>
 <style>{TOKENS_CSS}</style></head>
 <body>{banner}<div class="wrap">
-<div class="receipt">
-  <div class="receipt-header">
-    <div class="brand">maimen · receipts</div>
-    {''.join(lines)}
-  </div>
-</div>
+{body}
 <div class="foot">由 maimen-receipts 生成 · 输出非医疗或营养专业建议</div>
 </div></body></html>"""
 
@@ -242,9 +290,10 @@ def render_book(ledger: dict, month: str, *, demo: bool = False) -> str:
 
     cards = []
     for oid, o, _ in top:
-        cards.append(render_receipt(o, demo=demo))
+        cards.append(render_receipt(o, demo=demo, embedded=True))
 
     banner = '<div class="demo-banner">演示数据 · DEMO</div>' if demo else ''
+
     return f"""<!DOCTYPE html>
 <html lang="zh-CN"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
